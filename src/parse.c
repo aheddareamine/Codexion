@@ -23,11 +23,11 @@ static int	check_on_numbers(char **argv)
 	return (1);
 }
 
-static parameters	*init_parameters(char **argv)
+static t_parameters	*init_parameters(char **argv)
 {
-	parameters	*params;
+	t_parameters	*params;
 
-	params = malloc(sizeof(parameters));
+	params = malloc(sizeof(t_parameters));
 	if (!params)
 		return (NULL);
 	params->number_of_coders = atoi(argv[1]);
@@ -44,7 +44,7 @@ static parameters	*init_parameters(char **argv)
 	return (params);
 }
 
-parameters	*parse(int argc, char **argv)
+t_parameters	*parse(int argc, char **argv)
 {
 	if (argc != 9 || (strcmp(argv[8], "fifo") && strcmp(argv[8], "edf"))
 		|| !check_on_numbers(argv))

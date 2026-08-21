@@ -6,11 +6,11 @@
 /*   By: aaheddar <aaheddar@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/21 01:22:31 by aaheddar          #+#    #+#             */
-/*   Updated: 2026/08/21 01:24:04 by aaheddar         ###   ########.fr       */
+/*   Updated: 2026/08/21 22:06:30 by aaheddar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "./header/core.h"
+#include "header/core.h"
 
 void	print_parameters(t_parameters params)
 {
@@ -26,8 +26,7 @@ void	print_parameters(t_parameters params)
 
 int	main(int argc, char **argv)
 {
-	t_time			test;
-	long			time;
+	t_simulation	sim;
 	t_parameters	*parameters;
 
 	set_start_time();
@@ -35,8 +34,16 @@ int	main(int argc, char **argv)
 	if (!parameters)
 		return (1);
 	print_parameters(*parameters);
-	sleep(5);
-	time = gettimestamp();
-	printf("%ld\n", time);
+	if (!init_simulation(&sim, parameters))
+	{
+		free(parameters);
+		return (1);
+	}
+	printf("simulation initialised: %d coders, %d dongles\n",	
+		sim.params.number_of_coders, sim.params.number_of_coders);
+	printf("coder 1 left dongle index  : %d\n", sim.coders[0].left->index);
+	printf("coder 1 right dongle index : %d\n", sim.coders[0].right->index);
+	destroy_simulation(&sim);
+	free(parameters);
 	return (0);
 }

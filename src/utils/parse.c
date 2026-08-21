@@ -6,11 +6,11 @@
 /*   By: aaheddar <aaheddar@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/21 01:22:53 by aaheddar          #+#    #+#             */
-/*   Updated: 2026/08/21 01:22:54 by aaheddar         ###   ########.fr       */
+/*   Updated: 2026/08/21 22:11:44 by aaheddar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "./header/core.h"
+#include "./../header/core.h"
 
 static int	check_on_numbers(char **argv)
 {
@@ -59,7 +59,7 @@ static t_parameters	*init_parameters(char **argv)
 t_parameters	*parse(int argc, char **argv)
 {
 	if (argc != 9 || (strcmp(argv[8], "fifo") && strcmp(argv[8], "edf"))
-		|| !check_on_numbers(argv))
+		|| !check_on_numbers(argv) || atoi(argv[1]) == 0)
 	{
 		fprintf(stderr, "parameters should follow the format:\n\
 [number_of_coders] [time_to_burnout] [time_to_compile] [time_to_debug] \

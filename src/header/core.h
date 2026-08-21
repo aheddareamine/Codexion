@@ -6,11 +6,11 @@
 /*   By: aaheddar <aaheddar@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/21 01:22:27 by aaheddar          #+#    #+#             */
-/*   Updated: 2026/08/21 10:05:11 by aaheddar         ###   ########.fr       */
+/*   Updated: 2026/08/21 21:42:52 by aaheddar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef CORE_H
+# ifndef CORE_H
 # define CORE_H
 
 # include <pthread.h>
@@ -21,6 +21,7 @@
 # include <unistd.h>
 
 typedef struct timeval	t_time;
+typedef struct s_simulation	t_simulation;
 
 typedef enum e_scheduler
 {
@@ -35,7 +36,7 @@ typedef enum e_coder_state
 	REFACTORING
 }						t_coder_state;
 
-typedef struct parameters
+typedef struct s_parameters
 {
 	int					number_of_coders;
 	int					time_to_burnout;
@@ -47,30 +48,42 @@ typedef struct parameters
 	t_scheduler			scheduler;
 }						t_parameters;
 
-typedef struct coder
+typedef struct s_dongle
 {
-	int					index;
-	int					compilation_number;
-	t_coder_state		state;
-	pthread_t			*thread;
-}						t_coder;
-
-typedef struct dongle
-{
-	int					index;
-	int					cooldow;
+	int					index;	
 	int					taken;
+	pthread_mutex_t		lock;
+	pthread_cond_t		cond;
+	long long 			available_at;
 }						t_dongle;
 
-typedef struct simulation
+typedef struct s_coder
 {
-	int					nb_coders;
-	t_coder				*coders;
-	t_dongle			*dongles;
-}						t_simulation;
+	int					index;
+	int					compile_number;
+	t_coder_state		state;
+	t_dongle			*left;
+	t_dongle			*right;
+	t_time				last_compile;
+	pthread_t			thread;
+	t_simulation		*sim;
+}						t_coder;
+
+typedef struct s_simulation{
+	t_parameters	params;
+	t_coder			*coders;
+	t_dongle		*dongles;
+	int				ended;
+	pthread_mutex_t	end_lock;
+	pthread_mutex_t	print_lock;
+	
+}		t_simulation;
+
 
 t_parameters			*parse(int argc, char **args);
 long					gettimestamp(void);
 void					set_start_time(void);
+int				init_simulation(t_simulation *sim, t_parameters *params);
+void			destroy_simulation(t_simulation *sim);
 
 #endif

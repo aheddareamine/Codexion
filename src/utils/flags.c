@@ -1,36 +1,30 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   time_stamp.c                                       :+:      :+:    :+:   */
+/*   flags.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: aaheddar <aaheddar@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/08/21 01:22:35 by aaheddar          #+#    #+#             */
-/*   Updated: 2026/08/22 13:33:31 by aaheddar         ###   ########.fr       */
+/*   Created: 2026/08/22 14:00:00 by aaheddar          #+#    #+#             */
+/*   Updated: 2026/08/22 17:43:50 by aaheddar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../header/core.h"
 
-static t_time	*get_start_time(void)
+int	is_ended(t_simulation *sim)
 {
-	static t_time	start_time;
+	int	ended;
 
-	return (&start_time);
+	pthread_mutex_lock(&sim->end_lock);
+	ended = sim->ended;
+	pthread_mutex_unlock(&sim->end_lock);
+	return (ended);
 }
 
-void	set_start_time(void)
+void	set_ended(t_simulation *sim)
 {
-	gettimeofday(get_start_time(), NULL);
-}
-
-long	gettimestamp(void)
-{
-	t_time	*start_time;
-	t_time	present_time;
-
-	start_time = get_start_time();
-	gettimeofday(&present_time, NULL);
-	return ((present_time.tv_sec - start_time->tv_sec) * 1000
-		+ (present_time.tv_usec - start_time->tv_usec) / 1000);
+	pthread_mutex_lock(&sim->end_lock);
+	sim->ended = 1;
+	pthread_mutex_unlock(&sim->end_lock);
 }

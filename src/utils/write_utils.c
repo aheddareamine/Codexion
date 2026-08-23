@@ -1,33 +1,49 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   write_utils.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: aaheddar <aaheddar@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/08/21 01:22:31 by aaheddar          #+#    #+#             */
-/*   Updated: 2026/08/23 20:22:41 by aaheddar         ###   ########.fr       */
+/*   Created: 2026/08/22 15:30:00 by aaheddar          #+#    #+#             */
+/*   Updated: 2026/08/23 20:19:10 by aaheddar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "header/core.h"
+#include "../header/core.h"
 
-int	main(int argc, char **argv)
+int	put_ulong(char *buf, long n)
 {
-	t_simulation	sim;
-	t_parameters	*parameters;
+	char	tmp[24];
+	int		i;
+	int		len;
 
-	parameters = parse(argc, argv);
-	if (!parameters)
-		return (1);
-	if (!init_simulation(&sim, parameters))
+	if (n == 0)
 	{
-		free(parameters);
+		buf[0] = '0';
 		return (1);
 	}
-	free(parameters);
-	set_start_time();
-	run_simulation(&sim);
-	destroy_simulation(&sim);
-	return (0);
+	i = 0;
+	while (n > 0)
+	{
+		tmp[i++] = '0' + (n % 10);
+		n /= 10;
+	}
+	len = 0;
+	while (i > 0)
+		buf[len++] = tmp[--i];
+	return (len);
+}
+
+int	put_str(char *buf, const char *s)
+{
+	int	i;
+
+	i = 0;
+	while (s[i])
+	{
+		buf[i] = s[i];
+		i++;
+	}
+	return (i);
 }

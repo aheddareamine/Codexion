@@ -6,7 +6,7 @@
 /*   By: aaheddar <aaheddar@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/22 14:00:00 by aaheddar          #+#    #+#             */
-/*   Updated: 2026/08/22 17:43:43 by aaheddar         ###   ########.fr       */
+/*   Updated: 2026/08/23 20:21:23 by aaheddar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,8 +23,18 @@ static const char	*state_to_msg(t_coder_state state)
 
 void	print_log(t_coder *coder, const char *msg)
 {
+	char	buf[128];
+	int		len;
+
+	len = 0;
 	pthread_mutex_lock(&coder->sim->print_lock);
-	printf("%ld %d %s\n", gettimestamp(), coder->index, msg);
+	len += put_ulong(buf + len, gettimestamp());
+	buf[len++] = ' ';
+	len += put_ulong(buf + len, coder->index);
+	buf[len++] = ' ';
+	len += put_str(buf + len, msg);
+	buf[len++] = '\n';
+	write(1, buf, len);
 	pthread_mutex_unlock(&coder->sim->print_lock);
 }
 

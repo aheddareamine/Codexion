@@ -22,6 +22,10 @@ static int	init_dongles(t_simulation *sim)
 		sim->dongles[i].index = i;
 		sim->dongles[i].taken = 0;
 		sim->dongles[i].available_at = 0;
+		sim->dongles[i].next_seq = 0;
+		if (!pq_init(&sim->dongles[i].queue,
+				sim->params.number_of_coders, sim->params.scheduler))
+			return (0);
 		if (pthread_mutex_init(&sim->dongles[i].lock, NULL) != 0)
 			return (0);
 		if (pthread_cond_init(&sim->dongles[i].cond, NULL) != 0)
@@ -46,6 +50,7 @@ static void	init_coders(t_simulation *sim)
 		sim->coders[i].left = &sim->dongles[i];
 		sim->coders[i].right = &sim->dongles[(i + 1) % n];
 		sim->coders[i].sim = sim;
+		gettimeofday(&sim->coders[i].last_compile, NULL);
 		i++;
 	}
 }
@@ -77,6 +82,7 @@ void	destroy_simulation(t_simulation *sim)
 	{
 		pthread_mutex_destroy(&sim->dongles[i].lock);
 		pthread_cond_destroy(&sim->dongles[i].cond);
+		pq_free(&sim->dongles[i].queue);
 		i++;
 	}
 	pthread_mutex_destroy(&sim->end_lock);

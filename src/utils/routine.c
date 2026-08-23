@@ -6,41 +6,46 @@
 /*   By: aaheddar <aaheddar@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/22 14:00:00 by aaheddar          #+#    #+#             */
-/*   Updated: 2026/08/22 17:43:20 by aaheddar         ###   ########.fr       */
+/*   Updated: 2026/08/23 20:19:02 by aaheddar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../header/core.h"
 
-static void	acquire_one(t_dongle *dongle)
+static void	order_dongles(t_coder *coder, t_dongle **low, t_dongle **high)
 {
-	(void)dongle;
+	if (coder->left->index <= coder->right->index)
+	{
+		*low = coder->left;
+		*high = coder->right;
+	}
+	else
+	{
+		*low = coder->right;
+		*high = coder->left;
+	}
 }
 
 void	take_dongles(t_coder *coder)
 {
-	acquire_one(coder->left);
-	log_dongle(coder);
-	acquire_one(coder->right);
-	log_dongle(coder);
+	t_dongle	*low;
+	t_dongle	*high;
+
+	order_dongles(coder, &low, &high);
+	acquire_dongle(coder, low);
+	acquire_dongle(coder, high);
 }
 
-/*
-** release_dongles: STUB for Day 3. Will mark both dongles free, stamp
-** available_at = now + dongle_cooldown, and signal waiters on each cond.
-*/
 void	release_dongles(t_coder *coder)
 {
-	(void)coder;
+	t_dongle	*low;
+	t_dongle	*high;
+
+	order_dongles(coder, &low, &high);
+	release_dongle(coder, high);
+	release_dongle(coder, low);
 }
 
-/*
-** run_cycle: one full turn of the coder's life. Take both dongles, compile
-** (holding them), release, debug, refactor. State is set BEFORE each log_state
-** so the enum-driven logger prints the right line. last_compile is stamped at
-** the START of compiling because the burnout deadline is measured from there
-** (Day 4). compile_number is incremented once a compile completes.
-*/
 static void	run_cycle(t_coder *coder)
 {
 	t_parameters	*p;
@@ -61,15 +66,6 @@ static void	run_cycle(t_coder *coder)
 	usleep(p->time_to_refactor * 1000);
 }
 
-/*
-** coder_routine: the function each coder thread runs.
-** The while condition has a Day-2 PLACEHOLDER: a coder stops once it has
-** personally compiled number_of_compiles_required times, purely so the test
-** terminates. The REAL rule (Day 4) is global -- the simulation stops when
-** EVERY coder has reached the threshold, or when one burns out -- and will be
-** enforced by the monitor setting the shared `ended` flag, which is why the
-** is_ended() check is already here on the left of the &&.
-*/
 void	*coder_routine(void *arg)
 {
 	t_coder	*coder;
